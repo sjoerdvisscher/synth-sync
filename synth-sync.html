@@ -1,0 +1,24 @@
+<head>
+  <title>Synth Sync</title>
+  <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+</head>
+
+<body>
+  <h1>Synth Sync</h1>
+  {{> main}}
+</body>
+
+<template name="main">
+  <button id="addBox">Add Box</button>
+  {{#if jsPlumbReady}}
+    {{#each boxes}}
+      {{>box}}
+    {{/each}}
+  {{/if}}
+</template>
+
+<template name="box">
+  <div class="box alert alert-info" style="left: {{x}}px; top: {{y}}px">
+    <button class="close">&times;</button>
+  </div>
+</template>
