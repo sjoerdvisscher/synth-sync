@@ -1,6 +1,5 @@
 <head>
   <title>Synth Sync</title>
-  <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
 </head>
 
 <body>
@@ -18,11 +17,11 @@
       </div>
     </div>
   </div>
-  {{#if jsPlumbReady}}
+  <div class="main">
     {{#each boxes}}
       {{>box}}
     {{/each}}
-  {{/if}}
+  </div>
 </template>
 
 <template name="box">
