@@ -4,12 +4,20 @@
 </head>
 
 <body>
-  <h1>Synth Sync</h1>
   {{> main}}
 </body>
 
 <template name="main">
-  <button id="addBox">Add Box</button>
+  <div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <span class="brand">Synth Sync</span>
+        <ul class="nav">
+          <li><a href="#" id="addBox"><i class="icon-plus-sign"></i> Add Box</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
   {{#if jsPlumbReady}}
     {{#each boxes}}
       {{>box}}
