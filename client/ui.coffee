@@ -52,13 +52,13 @@ Template.box.events
     dragInfo.moveHandler = (dx, dy) =>
       Boxes.update {_id: this._id}, {$inc: {x: dx, y: dy}}
       
-  "mousedown .port": (evt) ->
+  "mousedown .port": (evt, template) ->
     from = $(evt.target).data "type"
     to = if from is "input" then "output" else "input"
     conn = 
       x: evt.pageX
       y: evt.pageY
-    conn[from + "BoxId"] = $(evt.target).closest(".box").prop("id")
+    conn[from + "BoxId"] = template.data._id
     conn[from + "Name"] = this.name
     connId = Connections.insert conn
     connected = false
@@ -83,9 +83,9 @@ Template.box.events
       else
         Meteor.call "deleteConn", connId
         
-  "mouseenter .port": (evt) ->
+  "mouseenter .port": (evt, template) ->
     if dragInfo.enterHandler and $(evt.target).data("type") is dragInfo.dropType
-      dragInfo.enterHandler $(evt.target).closest(".box").prop("id"), this.name
+      dragInfo.enterHandler template.data._id, this.name
       
   "mouseleave .port": (evt) ->
     if dragInfo.leaveHandler and $(evt.target).data("type") is dragInfo.dropType
