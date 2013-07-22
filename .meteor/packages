@@ -8,10 +8,10 @@ insecure
 preserve-inputs
 bootstrap
 coffeescript
-accounts-ui
 underscore
-less
 accounts-facebook
 accounts-github
 accounts-google
 accounts-twitter
+stylus
+accounts-ui

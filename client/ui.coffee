@@ -3,6 +3,7 @@ Template.main.boxes = ->
 Template.main.connections = ->
   Connections.find()
 
+
 dragInfo = 
   startX: 0
   startY: 0
@@ -12,7 +13,9 @@ dragInfo =
   upHandler: null
   type: null
 
+
 Template.main.events
+
   "click #addBox": ->
     Boxes.insert
       x: 100
@@ -23,11 +26,13 @@ Template.main.events
   "mousedown": (evt) ->
     dragInfo.startX = evt.pageX
     dragInfo.startY = evt.pageY
+    
   "mousemove": (evt) ->
     if dragInfo.moveHandler
       dragInfo.moveHandler evt.pageX - dragInfo.startX, evt.pageY - dragInfo.startY
       dragInfo.startX = evt.pageX
       dragInfo.startY = evt.pageY
+      
   "mouseup": ->
     if dragInfo.upHandler
       dragInfo.upHandler()
@@ -39,11 +44,14 @@ Template.main.events
 
 
 Template.box.events
+
   "click .close": ->
     Meteor.call "deleteBox", this._id
+    
   "mousedown": ->
     dragInfo.moveHandler = (dx, dy) =>
       Boxes.update {_id: this._id}, {$inc: {x: dx, y: dy}}
+      
   "mousedown .port": (evt) ->
     from = $(evt.target).data "type"
     to = if from is "input" then "output" else "input"
@@ -74,9 +82,11 @@ Template.box.events
         Connections.update {_id: connId}, {$unset: {x: 0, y: 0}}
       else
         Meteor.call "deleteConn", connId
+        
   "mouseenter .port": (evt) ->
     if dragInfo.enterHandler and $(evt.target).data("type") is dragInfo.dropType
       dragInfo.enterHandler $(evt.target).closest(".box").prop("id"), this.name
+      
   "mouseleave .port": (evt) ->
     if dragInfo.leaveHandler and $(evt.target).data("type") is dragInfo.dropType
       dragInfo.leaveHandler()
