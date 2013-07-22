@@ -21,11 +21,26 @@
     {{#each boxes}}
       {{>box}}
     {{/each}}
+    {{#each connections}}
+      {{>connection}}
+    {{/each}}
   </div>
 </template>
 
 <template name="box">
-  <div class="box alert alert-info" style="left: {{x}}px; top: {{y}}px">
+  <div class="box alert alert-info" style="left: {{x}}px; top: {{y}}px" id="{{_id}}">
     <button class="close">&times;</button>
+    {{#each inputs}}
+      <div class="port input" data-type="input" style="left: {{x}}px; top: {{y}}px">{{name}}</div>
+    {{/each}}
+    {{#each outputs}}
+      <div class="port output" data-type="output" style="right: {{x}}px; top: {{y}}px">{{name}}</div>
+    {{/each}}
   </div>
+</template>
+
+<template name="connection">
+  <svg>
+    <path d="{{points}}" class="{{dragging}}" />
+  </svg>
 </template>
