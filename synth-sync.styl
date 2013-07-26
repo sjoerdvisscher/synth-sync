@@ -22,17 +22,16 @@ svg
 .box
   position: absolute
   width: 140px
-  height: 100px
   box-shadow: 1px 1px 5px rgba(90,90,90,.3)
-  padding: 0
+  padding: 0 1em
   -webkit-user-select: none
   cursor: move
   
   .close
-    margin-right: 25px
+    margin-right: 0.5em
   .port
-    position: absolute
     cursor: default
+    height: 30px
     &::before
       display: block
       content: ""
@@ -44,10 +43,17 @@ svg
   .input::before
     float: left
     margin-right: 10px
-  .output::before
-    float: right
-    margin-left: 10px
+  .output
+    text-align: right
+    &::before
+      float: right
+      margin-left: 10px
     
 .login-link-text
   text-decoration: none !important
   color: inherit
+  
+.madewith_badge
+  position: fixed !important
+  top: auto !important
+  bottom: 0 !important

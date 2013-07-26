@@ -2,6 +2,8 @@ Template.main.boxes = ->
   Boxes.find()
 Template.main.connections = ->
   Connections.find()
+Template.main.components = ->
+  Components.find()
 
 
 dragInfo = 
@@ -16,12 +18,8 @@ dragInfo =
 
 Template.main.events
 
-  "click #addBox": ->
-    Boxes.insert
-      x: 100
-      y: 100
-      inputs: [{ name: "Audio In", x: 20, y: 20 }]
-      outputs: [{ name: "Audio Out", x: 20, y: 50 }]
+  "click .addComponent": ->
+    Boxes.insert _.extend(_.omit(this, "_id"), { x: 100, y: 100 })
         
   "mousedown": (evt) ->
     dragInfo.startX = evt.pageX
@@ -46,11 +44,11 @@ Template.main.events
 Template.box.events
 
   "click .close": ->
-    Meteor.call "deleteBox", this._id
+    Meteor.call "deleteBox", @_id
     
   "mousedown": ->
     dragInfo.moveHandler = (dx, dy) =>
-      Boxes.update {_id: this._id}, {$inc: {x: dx, y: dy}}
+      Boxes.update {_id: @_id}, {$inc: {x: dx, y: dy}}
       
   "mousedown .port": (evt, template) ->
     from = $(evt.target).data "type"
@@ -59,7 +57,7 @@ Template.box.events
       x: evt.pageX
       y: evt.pageY
     conn[from + "BoxId"] = template.data._id
-    conn[from + "Name"] = this.name
+    conn[from + "Index"] = getIndexByName template.data[from + "s"], @name
     connId = Connections.insert conn
     connected = false
     dragInfo.dropType = to
@@ -68,13 +66,13 @@ Template.box.events
     dragInfo.enterHandler = (boxId, name) ->
       props = {}
       props[to + "BoxId"] = boxId
-      props[to + "Name"] = name
+      props[to + "Index"] = getIndexByName (Boxes.findOne {_id: boxId})[to + "s"], name
       Connections.update {_id: connId}, {$set: props}
       connected = true
     dragInfo.leaveHandler = ->
       props = {}
       props[to + "BoxId"] = null
-      props[to + "Name"] = null
+      props[to + "Index"] = null
       Connections.update {_id: connId}, {$unset: props}
       connected = false
     dragInfo.upHandler = ->
@@ -85,7 +83,7 @@ Template.box.events
         
   "mouseenter .port": (evt, template) ->
     if dragInfo.enterHandler and $(evt.target).data("type") is dragInfo.dropType
-      dragInfo.enterHandler template.data._id, this.name
+      dragInfo.enterHandler template.data._id, @name
       
   "mouseleave .port": (evt) ->
     if dragInfo.leaveHandler and $(evt.target).data("type") is dragInfo.dropType
@@ -93,30 +91,33 @@ Template.box.events
 
 
 Template.connection.points = ->
-  outputBox = Boxes.findOne {_id: this.outputBoxId }
+  outputBox = Boxes.findOne { _id: @outputBoxId }
   if outputBox
-    output = _.find outputBox.outputs, (inp) => inp.name is this.outputName
-    outputX = outputBox.x + output.x + 100 - 10 + 1
-    outputY = outputBox.y + output.y + 11
+    output = outputBox.outputs[@outputIndex]
+    outputX = outputBox.x + 145
+    outputY = outputBox.y + (@outputIndex + outputBox.inputs.length)*30 + 51
   else
-    outputX = this.x
-    outputY = this.y
-  inputBox = Boxes.findOne {_id: this.inputBoxId }
+    outputX = @x
+    outputY = @y
+  inputBox = Boxes.findOne {_id: @inputBoxId }
   if inputBox
-    input = _.find inputBox.inputs, (inp) => inp.name is this.inputName
-    inputX = inputBox.x + input.x + 11
-    inputY = inputBox.y + input.y + 11
+    input = inputBox.inputs[@inputIndex]
+    inputX = inputBox.x + 25
+    inputY = inputBox.y + @inputIndex * 30 + 51
   else
-    inputX = this.x
-    inputY = this.y
+    inputX = @x
+    inputY = @y
   dx = inputX - outputX
   dy = inputY - outputY
   hang = Math.max(dy, 0) + 200
-  return "M " + outputX + " " + outputY + " q " + dx / 2 + " " + hang + " " + dx + " " + dy
+  return "M #{outputX} #{outputY} q #{dx / 2} #{hang} #{dx} #{dy}"
 
 Template.connection.dragging = ->
-  if this.x then "dragging" else ""
+  if @x then "dragging" else ""
   
 Template.connection.events
   "click": ->
-    Meteor.call "deleteConn", this._id
+    Meteor.call "deleteConn", @_id
+
+getIndexByName = (list, name) ->
+  _.find _.range(list.length), (i) => list[i].name is name
