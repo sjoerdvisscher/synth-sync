@@ -1,7 +1,7 @@
 Meteor.methods
   deleteBox: (id) ->
-    Connections.remove {sourceBoxId: id}
-    Connections.remove {targetBoxId: id}
+    Connections.remove {inputBoxId: id}
+    Connections.remove {outputBoxId: id}
     Boxes.remove {_id: id}
   deleteConn: (id) ->
     Connections.remove {_id: id}

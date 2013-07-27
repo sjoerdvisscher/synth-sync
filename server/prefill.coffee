@@ -15,5 +15,10 @@ Meteor.startup ->
     
   Components.insert
     name: "Delay"
-    inputs: [{ name: "Audio In" }, { name: "Delay time" }]
+    inputs: [{ name: "Audio In" }, { name: "Delay time", param: "delayTime" }]
     outputs: [{ name: "Audio Out" }]
+
+  Components.insert
+    name: "Slider"
+    inputs: []
+    outputs: [{ name: "Value"} ]

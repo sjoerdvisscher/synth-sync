@@ -41,10 +41,15 @@ Template.main.events
 
 
 
+Template.box.nameIs = (name) -> name is @name
+
 Template.box.events
 
   "click .close": ->
     Meteor.call "deleteBox", @_id
+
+  "mousedown input, mousemove input, mouseup input": (evt) ->
+    evt.stopImmediatePropagation()
     
   "mousedown": ->
     dragInfo.moveHandler = (dx, dy) =>
@@ -66,7 +71,10 @@ Template.box.events
     dragInfo.enterHandler = (boxId, name) ->
       props = {}
       props[to + "BoxId"] = boxId
-      props[to + "Index"] = getIndexByName (Boxes.findOne {_id: boxId})[to + "s"], name
+      ports = (Boxes.findOne {_id: boxId})[to + "s"]
+      index = getIndexByName ports, name
+      props[to + "Index"] = index
+      props[to + "Param"] = ports[index].param
       Connections.update {_id: connId}, {$set: props}
       connected = true
     dragInfo.leaveHandler = ->
@@ -88,9 +96,15 @@ Template.box.events
   "mouseleave .port": (evt) ->
     if dragInfo.leaveHandler and $(evt.target).data("type") is dragInfo.dropType
       dragInfo.leaveHandler()
-
+  
+  "change input": (evt) ->
+    props = {}
+    props[evt.target.name] = evt.target.value
+    Boxes.update {_id: @_id}, {$set: props}
+  
 
 Template.connection.points = ->
+  
   outputBox = Boxes.findOne { _id: @outputBoxId }
   if outputBox
     output = outputBox.outputs[@outputIndex]
@@ -99,7 +113,8 @@ Template.connection.points = ->
   else
     outputX = @x
     outputY = @y
-  inputBox = Boxes.findOne {_id: @inputBoxId }
+  
+  inputBox = Boxes.findOne { _id: @inputBoxId }
   if inputBox
     input = inputBox.inputs[@inputIndex]
     inputX = inputBox.x + 25
@@ -107,10 +122,15 @@ Template.connection.points = ->
   else
     inputX = @x
     inputY = @y
+  
   dx = inputX - outputX
   dy = inputY - outputY
+  if isNaN(dx) or isNaN(dy)
+    return "M 0 0"
+    
   hang = Math.max(dy, 0) + 200
   return "M #{outputX} #{outputY} q #{dx / 2} #{hang} #{dx} #{dy}"
+
 
 Template.connection.dragging = ->
   if @x then "dragging" else ""
