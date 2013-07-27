@@ -21,12 +21,18 @@ Template.box.created = ->
     when "Speaker"
       nodes[@data._id] = audioContext.destination
     when "Slider"
-      proc = audioContext.createScriptProcessor(256, 0, 1)
+      proc = audioContext.createScriptProcessor(1024, 0, 1)
+      prevValue = undefined
       proc.onaudioprocess = (evt) =>
         outputArray = evt.outputBuffer.getChannelData(0)
         value = Boxes.findOne({_id: @data._id}).value
-        for i in [0..outputArray.length - 1]
-          outputArray[i] = value
+        if prevValue is undefined
+          prevValue = value
+        len = outputArray.length - 1
+        delta = value - prevValue
+        for i in [0..len]
+          outputArray[i] = prevValue + delta * i / len
+        prevValue = value
         return
       nodes[@data._id] = proc
     when "Oscillator"
@@ -60,7 +66,7 @@ connect = (conn) ->
         nodes[conn.outputBoxId].connect nodes[conn.inputBoxId], conn.outputIndex, conn.inputIndex
     catch e
       console.log e
-      Meteor.setTimeout((-> connect conn), 100)
+      Meteor.call "deleteConn", conn._id
 
 Template.connection.destroyed = ->
   nodes[@data.outputBoxId]?.disconnect()

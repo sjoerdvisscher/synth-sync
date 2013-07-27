@@ -34,7 +34,7 @@ Meteor.startup ->
     inputs: [
       { name: "Audio In" },
       { name: "Frequency", param: "frequency" }, { name: "Detune", param: "detune" },
-      { name: "Q", param: "q" }, { name: "Gain", param: "gain" }
+      { name: "Q", param: "Q" }, { name: "Gain", param: "gain" }
     ]
     outputs: [{ name: "Audio Out" }]
     type: 0

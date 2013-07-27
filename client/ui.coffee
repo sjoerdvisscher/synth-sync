@@ -128,7 +128,7 @@ Template.connection.points = ->
   if isNaN(dx) or isNaN(dy)
     return "M 0 0"
     
-  hang = Math.max(dy, 0) + 200
+  hang = Math.max(dy, 0) + Math.sqrt(dx*dx + dy*dy)/5
   return "M #{outputX} #{outputY} q #{dx / 2} #{hang} #{dx} #{dy}"
 
 
