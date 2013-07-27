@@ -16,7 +16,10 @@ Template.box.created = ->
       )
     when "Delay"
       nodes[@data._id] = audioContext.createDelay(10)
-      nodes[@data._id].delayTime.value = 0
+      nodes[@data._id].delayTime.value = 0.2
+    when "Gain"
+      nodes[@data._id] = audioContext.createGain()
+      nodes[@data._id].gain.value = 1
     when "Speaker"
       nodes[@data._id] = audioContext.destination
     when "Slider"
@@ -50,6 +53,7 @@ connect = (conn) ->
     console.log("creating: #{conn.outputBoxId} (#{conn.outputIndex}) -> " +
       "#{conn.inputBoxId} (#{conn.inputParam || conn.inputIndex })")
     if conn.inputParam
+      nodes[conn.inputBoxId][conn.inputParam].value = 0
       nodes[conn.outputBoxId].connect nodes[conn.inputBoxId][conn.inputParam], conn.outputIndex
     else  
       nodes[conn.outputBoxId].connect nodes[conn.inputBoxId], conn.outputIndex, conn.inputIndex

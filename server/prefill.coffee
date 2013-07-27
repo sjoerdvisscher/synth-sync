@@ -19,6 +19,11 @@ Meteor.startup ->
     outputs: [{ name: "Audio Out" }]
 
   Components.insert
+    name: "Gain"
+    inputs: [{ name: "Audio In" }, { name: "Gain", param: "gain" }]
+    outputs: [{ name: "Audio Out" }]
+  
+  Components.insert
     name: "Slider"
     inputs: []
     outputs: [{ name: "Value" }]
