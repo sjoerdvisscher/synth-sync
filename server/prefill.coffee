@@ -21,4 +21,7 @@ Meteor.startup ->
   Components.insert
     name: "Slider"
     inputs: []
-    outputs: [{ name: "Value"} ]
+    outputs: [{ name: "Value" }]
+    value: 0
+    min: -10
+    max: 10

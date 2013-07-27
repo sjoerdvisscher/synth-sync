@@ -48,7 +48,10 @@
       <div class="port output" data-type="output">{{name}}</div>
     {{/each}}
     {{#if nameIs "Slider"}}
-      <input type="range" name="value" min="-10" max="10" step="0.01" value="{{value}}">
+      <input type="range" name="value" min="{{min}}" max="{{max}}" step="0.01" value="{{value}}">
+      <input name="min" value="{{min}}" class="min-input">
+      <input name="max" value="{{max}}" class="max-input">
+      <div class="value-output">{{value}}</div>
     {{/if}}
   </div>
 </template>
