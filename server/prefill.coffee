@@ -24,6 +24,12 @@ Meteor.startup ->
     outputs: [{ name: "Audio Out" }]
   
   Components.insert
+    name: "Oscillator"
+    inputs: [{ name: "Frequency", param: "frequency" }, { name: "Detune", param: "detune" }]
+    outputs: [{ name: "Audio Out" }]
+    type: 0
+
+  Components.insert
     name: "Slider"
     inputs: []
     outputs: [{ name: "Value" }]

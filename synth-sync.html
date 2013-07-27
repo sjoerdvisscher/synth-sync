@@ -53,6 +53,14 @@
       <input name="max" value="{{max}}" class="max-input">
       <div class="value-output">{{value}}</div>
     {{/if}}
+    {{#if nameIs "Oscillator"}}
+      <select name="type">
+        <option value="0">Sine</option>
+        <option value="1">Square</option>
+        <option value="2">Sawtooth</option>
+        <option value="3">Triangle</option>
+      </select>
+    {{/if}}
   </div>
 </template>
 

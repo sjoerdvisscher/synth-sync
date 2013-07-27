@@ -48,7 +48,7 @@ Template.box.events
   "click .close": ->
     Meteor.call "deleteBox", @_id
 
-  "mousedown input, mousemove input, mouseup input": (evt) ->
+  "mousedown :input, mousemove :input, mouseup :input": (evt) ->
     evt.stopImmediatePropagation()
     
   "mousedown": ->
@@ -97,9 +97,9 @@ Template.box.events
     if dragInfo.leaveHandler and $(evt.target).data("type") is dragInfo.dropType
       dragInfo.leaveHandler()
   
-  "change input": (evt) ->
+  "change :input": (evt) ->
     props = {}
-    props[evt.target.name] = evt.target.value
+    props[evt.target.name] = 1 * evt.target.value
     Boxes.update {_id: @_id}, {$set: props}
   
 

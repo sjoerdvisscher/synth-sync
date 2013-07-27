@@ -33,13 +33,10 @@ Template.box.created = ->
       nodes[@data._id] = proc
     when "Oscillator"
       osc = audioContext.createOscillator()
-      nodes[@data._id] = osc
-      osc.type = OscillatorNode.CUSTOM
       Deps.autorun =>
-        value = Boxes.findOne({_id: @data._id}).value
-        wave = audioContext.createPeriodicWave(new Float32Array [value], new Float32Array [0])
-        osc.setPeriodicWave wave
-      osc.start()
+        osc.type = Boxes.findOne({_id: @data._id}).type
+      osc.start(audioContext.currentTime)
+      nodes[@data._id] = osc
     else
       console.error "Not implemented: #{@data.name}"
         
