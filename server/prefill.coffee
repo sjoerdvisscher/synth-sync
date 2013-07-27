@@ -30,6 +30,16 @@ Meteor.startup ->
     type: 0
 
   Components.insert
+    name: "Biquad Filter"
+    inputs: [
+      { name: "Audio In" },
+      { name: "Frequency", param: "frequency" }, { name: "Detune", param: "detune" },
+      { name: "Q", param: "q" }, { name: "Gain", param: "gain" }
+    ]
+    outputs: [{ name: "Audio Out" }]
+    type: 0
+  
+  Components.insert
     name: "Slider"
     inputs: []
     outputs: [{ name: "Value" }]

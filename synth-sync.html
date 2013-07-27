@@ -61,6 +61,18 @@
         <option value="3">Triangle</option>
       </select>
     {{/if}}
+    {{#if nameIs "Biquad Filter"}}
+      <select name="type">
+        <option value="0">Low Pass</option>
+        <option value="1">High Pass</option>
+        <option value="2">Band Pass</option>
+        <option value="3">Low Shelf</option>
+        <option value="4">High Shelf</option>
+        <option value="5">Peaking</option>
+        <option value="6">Notch</option>
+        <option value="7">All Pass</option>
+      </select>
+    {{/if}}
   </div>
 </template>
 

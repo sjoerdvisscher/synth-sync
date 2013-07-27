@@ -16,10 +16,8 @@ Template.box.created = ->
       )
     when "Delay"
       nodes[@data._id] = audioContext.createDelay(10)
-      nodes[@data._id].delayTime.value = 0.2
     when "Gain"
       nodes[@data._id] = audioContext.createGain()
-      nodes[@data._id].gain.value = 1
     when "Speaker"
       nodes[@data._id] = audioContext.destination
     when "Slider"
@@ -32,11 +30,16 @@ Template.box.created = ->
         return
       nodes[@data._id] = proc
     when "Oscillator"
-      osc = audioContext.createOscillator()
+      node = audioContext.createOscillator()
       Deps.autorun =>
-        osc.type = Boxes.findOne({_id: @data._id}).type
-      osc.start(audioContext.currentTime)
-      nodes[@data._id] = osc
+        node.type = Boxes.findOne({_id: @data._id}).type
+      node.start(audioContext.currentTime)
+      nodes[@data._id] = node
+    when "Biquad Filter"
+      node = audioContext.createBiquadFilter()
+      Deps.autorun =>
+        node.type = Boxes.findOne({_id: @data._id}).type
+      nodes[@data._id] = node
     else
       console.error "Not implemented: #{@data.name}"
         
@@ -47,13 +50,17 @@ connect = (conn) ->
   if not nodes[conn.outputBoxId] or not nodes[conn.inputBoxId]
     Meteor.setTimeout((-> connect conn), 100)
   else
-    console.log("creating: #{conn.outputBoxId} (#{conn.outputIndex}) -> " +
-      "#{conn.inputBoxId} (#{conn.inputParam || conn.inputIndex })")
-    if conn.inputParam
-      nodes[conn.inputBoxId][conn.inputParam].value = 0
-      nodes[conn.outputBoxId].connect nodes[conn.inputBoxId][conn.inputParam], conn.outputIndex
-    else  
-      nodes[conn.outputBoxId].connect nodes[conn.inputBoxId], conn.outputIndex, conn.inputIndex
+    try
+      console.log("creating: #{conn.outputBoxId} (#{conn.outputIndex}) -> " +
+        "#{conn.inputBoxId} (#{conn.inputParam || conn.inputIndex })")
+      if conn.inputParam
+        nodes[conn.inputBoxId][conn.inputParam].value = 0
+        nodes[conn.outputBoxId].connect nodes[conn.inputBoxId][conn.inputParam], conn.outputIndex
+      else  
+        nodes[conn.outputBoxId].connect nodes[conn.inputBoxId], conn.outputIndex, conn.inputIndex
+    catch e
+      console.log e
+      Meteor.setTimeout((-> connect conn), 100)
 
 Template.connection.destroyed = ->
   nodes[@data.outputBoxId]?.disconnect()
