@@ -4,6 +4,8 @@ Template.main.connections = ->
   Connections.find()
 Template.main.components = ->
   Components.find()
+Template.main.midiDevices = ->
+  MIDIDevices.find()
 
 
 dragInfo = 
@@ -41,8 +43,19 @@ Template.main.events
 
 
 
-Template.box.nameIs = (name) -> name is @name
+Template.box.nameIs = (name) -> 
+  name is @name
 
+Template.box.midiDevices = ->
+  devices = MIDIDevices.find().fetch()
+  for device in devices
+    device.selected = if device.id is this.midiInput then "selected" else ""
+  return devices
+
+Template.box.rendered = ->
+  this.findAll("select").map (sel) =>
+    sel.value = this.data[sel.name]
+  
 Template.box.events
 
   "click .close": ->
@@ -99,7 +112,8 @@ Template.box.events
   
   "change :input": (evt) ->
     props = {}
-    props[evt.target.name] = 1 * evt.target.value
+    value = evt.target.value
+    props[evt.target.name] = if isNaN(1 * value) then value else 1 * value
     Boxes.update {_id: @_id}, {$set: props}
   
 

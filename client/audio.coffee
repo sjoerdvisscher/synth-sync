@@ -7,7 +7,7 @@ Template.box.created = ->
   switch @data.name
     when "Microphone"
       navigator.webkitGetUserMedia(
-        {audio: true}, 
+        {audio: true}
         (stream) =>
           nodes[@data._id] = audioContext.createMediaStreamSource stream
         (e) =>
@@ -39,6 +39,14 @@ Template.box.created = ->
       node = audioContext.createOscillator()
       Deps.autorun =>
         node.type = Boxes.findOne({_id: @data._id}).type
+      Deps.autorun =>
+        midiInput = Boxes.findOne({_id: @data._id}).midiInput
+        if midiInput
+          addMidiListener midiInput, -1,
+            onnoteon: (note, vel) ->
+              node.frequency.setValueAtTime 449 * Math.pow(2, (note - 0x39)/12), audioContext.currentTime
+            onnoteoff: (note) ->
+              # node.frequency.value = 0
       node.start(audioContext.currentTime)
       nodes[@data._id] = node
     when "Biquad Filter"

@@ -60,6 +60,12 @@
         <option value="2">Sawtooth</option>
         <option value="3">Triangle</option>
       </select>
+      <select name="midiInput">
+        <option>MIDI input</option>
+        {{#each midiDevices}}
+          <option value="{{id}}">{{name}}</option>
+        {{/each}}
+      </select>
     {{/if}}
     {{#if nameIs "Biquad Filter"}}
       <select name="type">
