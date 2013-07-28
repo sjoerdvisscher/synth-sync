@@ -20,7 +20,7 @@ dragInfo =
 
 Template.main.events
 
-  "click .addComponent": ->
+  "click [data-role=add-component]": ->
     Boxes.insert _.extend(_.omit(this, "_id"), { x: 100, y: 100 })
         
   "mousedown": (evt) ->
@@ -49,12 +49,12 @@ Template.box.nameIs = (name) ->
 Template.box.midiDevices = ->
   devices = MIDIDevices.find().fetch()
   for device in devices
-    device.selected = if device.id is this.midiInput then "selected" else ""
+    device.selected = if device.id is @midiInput then "selected" else ""
   return devices
 
 Template.box.rendered = ->
-  this.findAll("select").map (sel) =>
-    sel.value = this.data[sel.name]
+  @findAll("select").map (sel) =>
+    sel.value = @data[sel.name]
   
 Template.box.events
 

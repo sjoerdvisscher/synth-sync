@@ -16,8 +16,15 @@
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Add Component <b class="caret"></b></a>
             <ul class="dropdown-menu">
               {{#each components}}
-                <li><a href="#" class="addComponent"><i class="icon-plus-sign"></i> Add {{name}}</a></li>
+                <li><a href="#" data-role="add-component"><i class="icon-plus-sign"></i> Add {{name}}</a></li>
               {{/each}}
+            </ul>
+          </li>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">MIDI Learning <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="#" data-role="midi-learning-on">On</a></li>
+              <li><a href="#" data-role="midi-learning-off">Off</a></li>
             </ul>
           </li>
         </ul>
