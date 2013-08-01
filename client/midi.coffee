@@ -41,19 +41,25 @@ Meteor.startup ->
       midiAccess = m
     
       for port in midiAccess.inputs()
+        
         MIDIDevices.insert
           id: port.id
           name: port.name
+        
         @addMidiListener port.id, -1,
+          
           onnoteon: (note, velocity) ->
+            freq = Math.round(4400 * Math.pow(2, (note - 69)/12)) / 10
             Boxes.find({name: "Oscillator", midiInput: port.id}).forEach (box) ->
-              Boxes.update {_id: box._id}, {$set: {"inputs.0.value": Math.round(4400 * Math.pow 2, (note - 0x39)/12) / 10}}
+              Boxes.update {_id: box._id}, {$set: {"inputs.0.value": freq }}
+          
           onpitchwheelchange: (change) -> 
             Boxes.find({name: "Oscillator", midiInput: port.id}).forEach (box) ->
               detune = box.inputs[1]
               value = (change + 1) / 2 * (detune.max - detune.min) + detune.min
               value = Math.round(value * 10) / 10
               Boxes.update {_id: box._id}, {$set: {"inputs.1.value": value}}
+          
           oncontrolchange: (control, value) ->
             if midiLearning and lastActiveRangeInput
               rangeInputs[control] = lastActiveRangeInput
