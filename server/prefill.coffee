@@ -15,17 +15,20 @@ Meteor.startup ->
     
   Components.insert
     name: "Delay"
-    inputs: [{ name: "Audio In" }, { name: "Delay time", param: "delayTime" }]
+    inputs: [{ name: "Audio In" }, { name: "Delay time", param: "delayTime", min: 0, max: 10, value: 0 }]
     outputs: [{ name: "Audio Out" }]
 
   Components.insert
     name: "Gain"
-    inputs: [{ name: "Audio In" }, { name: "Gain", param: "gain" }]
+    inputs: [{ name: "Audio In" }, { name: "Gain", param: "gain", min: 0, max: 10, value: 1 }]
     outputs: [{ name: "Audio Out" }]
   
   Components.insert
     name: "Oscillator"
-    inputs: [{ name: "Frequency", param: "frequency" }, { name: "Detune", param: "detune" }]
+    inputs: [
+      { name: "Frequency", param: "frequency", min: 0, max: 20000, value: 440 },
+      { name: "Detune", param: "detune", min: -1200, max: 1200, value: 0 }
+    ]
     outputs: [{ name: "Audio Out" }]
     type: 0
 
@@ -33,16 +36,10 @@ Meteor.startup ->
     name: "Biquad Filter"
     inputs: [
       { name: "Audio In" },
-      { name: "Frequency", param: "frequency" }, { name: "Detune", param: "detune" },
-      { name: "Q", param: "Q" }, { name: "Gain", param: "gain" }
+      { name: "Frequency", param: "frequency", min: 0, max: 20000, value: 350 },
+      { name: "Detune", param: "detune", min: -1200, max: 1200, value: 0 },
+      { name: "Q", param: "Q", min: 0, max: 1000, value: 1 },
+      { name: "Gain", param: "gain", min: -40, max: 40, value: 0 }
     ]
     outputs: [{ name: "Audio Out" }]
     type: 0
-  
-  Components.insert
-    name: "Slider"
-    inputs: []
-    outputs: [{ name: "Value" }]
-    value: 0
-    min: -10
-    max: 10

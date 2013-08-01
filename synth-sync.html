@@ -49,7 +49,15 @@
     <button class="close">&times;</button>
     <h5>{{name}}</h5>
     {{#each inputs}}
-      <div class="port input" data-type="input">{{name}}</div>
+      <div class="port input {{#if param}}param{{/if}}" data-type="input">
+        {{name}}
+        {{#if param}}
+          <input type="range" name="inputs.{{index}}.value" min="{{min}}" max="{{max}}" step="0.01" value="{{value}}">
+          <input name="inputs.{{index}}.min" value="{{min}}" class="min-input">
+          <input name="inputs.{{index}}.max" value="{{max}}" class="max-input">
+          <div class="value-output">{{value}}</div>
+        {{/if}}
+      </div>
     {{/each}}
     {{#each outputs}}
       <div class="port output" data-type="output">{{name}}</div>

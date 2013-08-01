@@ -8,7 +8,7 @@ Template.main.midiDevices = ->
   MIDIDevices.find()
 
 
-dragInfo = 
+dragInfo =
   startX: 0
   startY: 0
   moveHandler: null
@@ -21,7 +21,9 @@ dragInfo =
 Template.main.events
 
   "click [data-role=add-component]": ->
-    Boxes.insert _.extend(_.omit(this, "_id"), { x: 100, y: 100 })
+    box = _.extend(_.omit(this, "_id"), { x: 100, y: 100 })
+    _.each box.inputs, (input, index) -> input.index = index
+    Boxes.insert box
         
   "mousedown": (evt) ->
     dragInfo.startX = evt.pageX
@@ -43,7 +45,7 @@ Template.main.events
 
 
 
-Template.box.nameIs = (name) -> 
+Template.box.nameIs = (name) ->
   name is @name
 
 Template.box.midiDevices = ->
@@ -71,7 +73,7 @@ Template.box.events
   "mousedown .port": (evt, template) ->
     from = $(evt.target).data "type"
     to = if from is "input" then "output" else "input"
-    conn = 
+    conn =
       x: evt.pageX
       y: evt.pageY
     conn[from + "BoxId"] = template.data._id
@@ -110,11 +112,11 @@ Template.box.events
     if dragInfo.leaveHandler and $(evt.target).data("type") is dragInfo.dropType
       dragInfo.leaveHandler()
   
-  "change :input": (evt) ->
+  "change :input": (evt, template) ->
     props = {}
     value = evt.target.value
     props[evt.target.name] = if isNaN(1 * value) then value else 1 * value
-    Boxes.update {_id: @_id}, {$set: props}
+    Boxes.update {_id: template.data._id}, {$set: props}
   
 
 Template.connection.points = ->
@@ -123,7 +125,7 @@ Template.connection.points = ->
   if outputBox
     output = outputBox.outputs[@outputIndex]
     outputX = outputBox.x + 145
-    outputY = outputBox.y + (@outputIndex + outputBox.inputs.length)*30 + 51
+    outputY = outputBox.y + (@outputIndex + outputBox.inputs.length)*30 + 51 + 40 * _.filter(outputBox.inputs, (inp) -> inp.param).length
   else
     outputX = @x
     outputY = @y
@@ -132,7 +134,7 @@ Template.connection.points = ->
   if inputBox
     input = inputBox.inputs[@inputIndex]
     inputX = inputBox.x + 25
-    inputY = inputBox.y + @inputIndex * 30 + 51
+    inputY = inputBox.y + @inputIndex * 30 + 51 + 40 * _.filter(inputBox.inputs.slice(0, @inputIndex), (inp) -> inp.param).length
   else
     inputX = @x
     inputY = @y

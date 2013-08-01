@@ -32,6 +32,7 @@ svg
   .port
     cursor: default
     height: 30px
+    clear: both
     &::before
       display: block
       content: ""
@@ -40,6 +41,8 @@ svg
       background: white
       border-radius: 50%
       box-shadow: 1px 1px 5px rgba(90,90,90,.3)
+    &.param
+      height: 70px
   .input::before
     float: left
     margin-right: 10px
@@ -55,7 +58,7 @@ svg
     line-height: 0.8em
     padding: 0
     height: 1.2em
-    width: 2.4em
+    width: 3em
     text-align: right
   .min-input
     float: left

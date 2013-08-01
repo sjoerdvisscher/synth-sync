@@ -15,30 +15,31 @@ Template.box.created = ->
           console.log e
       )
     when "Delay"
-      nodes[@data._id] = audioContext.createDelay(10)
+      node = audioContext.createDelay(10)
+      Deps.autorun =>
+        box = Boxes.findOne({_id: @data._id})
+        for input in box.inputs
+          if input.param
+            node[input.param].value = input.value
+      nodes[@data._id] = node
     when "Gain"
-      nodes[@data._id] = audioContext.createGain()
+      node = audioContext.createGain()
+      Deps.autorun =>
+        box = Boxes.findOne({_id: @data._id})
+        for input in box.inputs
+          if input.param
+            node[input.param].value = input.value
+      nodes[@data._id] = node
     when "Speaker"
       nodes[@data._id] = audioContext.destination
-    when "Slider"
-      proc = audioContext.createScriptProcessor(1024, 0, 1)
-      prevValue = undefined
-      proc.onaudioprocess = (evt) =>
-        outputArray = evt.outputBuffer.getChannelData(0)
-        value = Boxes.findOne({_id: @data._id}).value
-        if prevValue is undefined
-          prevValue = value
-        len = outputArray.length - 1
-        delta = value - prevValue
-        for i in [0..len]
-          outputArray[i] = prevValue + delta * i / len
-        prevValue = value
-        return
-      nodes[@data._id] = proc
     when "Oscillator"
       node = audioContext.createOscillator()
       Deps.autorun =>
-        node.type = Boxes.findOne({_id: @data._id}).type
+        box = Boxes.findOne({_id: @data._id})
+        node.type = box.type
+        for input in box.inputs
+          if input.param
+            node[input.param].value = input.value
       Deps.autorun =>
         midiInput = Boxes.findOne({_id: @data._id}).midiInput
         if midiInput
@@ -52,7 +53,11 @@ Template.box.created = ->
     when "Biquad Filter"
       node = audioContext.createBiquadFilter()
       Deps.autorun =>
-        node.type = Boxes.findOne({_id: @data._id}).type
+        box = Boxes.findOne({_id: @data._id})
+        node.type = box.type
+        for input in box.inputs
+          if input.param
+            node[input.param].value = input.value
       nodes[@data._id] = node
     else
       console.error "Not implemented: #{@data.name}"
@@ -68,9 +73,8 @@ connect = (conn) ->
       console.log("creating: #{conn.outputBoxId} (#{conn.outputIndex}) -> " +
         "#{conn.inputBoxId} (#{conn.inputParam || conn.inputIndex })")
       if conn.inputParam
-        nodes[conn.inputBoxId][conn.inputParam].value = 0
         nodes[conn.outputBoxId].connect nodes[conn.inputBoxId][conn.inputParam], conn.outputIndex
-      else  
+      else
         nodes[conn.outputBoxId].connect nodes[conn.inputBoxId], conn.outputIndex, conn.inputIndex
     catch e
       console.log e
