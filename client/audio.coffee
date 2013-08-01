@@ -18,17 +18,13 @@ Template.box.created = ->
       node = audioContext.createDelay(10)
       Deps.autorun =>
         box = Boxes.findOne({_id: @data._id})
-        for input in box.inputs
-          if input.param
-            node[input.param].value = input.value
+        syncInputs node, box
       nodes[@data._id] = node
     when "Gain"
       node = audioContext.createGain()
       Deps.autorun =>
         box = Boxes.findOne({_id: @data._id})
-        for input in box.inputs
-          if input.param
-            node[input.param].value = input.value
+        syncInputs node, box
       nodes[@data._id] = node
     when "Speaker"
       nodes[@data._id] = audioContext.destination
@@ -37,17 +33,7 @@ Template.box.created = ->
       Deps.autorun =>
         box = Boxes.findOne({_id: @data._id})
         node.type = box.type
-        for input in box.inputs
-          if input.param
-            node[input.param].value = input.value
-      Deps.autorun =>
-        midiInput = Boxes.findOne({_id: @data._id}).midiInput
-        if midiInput
-          addMidiListener midiInput, -1,
-            onnoteon: (note, vel) ->
-              node.frequency.setValueAtTime 449 * Math.pow(2, (note - 0x39)/12), audioContext.currentTime
-            onnoteoff: (note) ->
-              # node.frequency.value = 0
+        syncInputs node, box
       node.start(audioContext.currentTime)
       nodes[@data._id] = node
     when "Biquad Filter"
@@ -55,18 +41,22 @@ Template.box.created = ->
       Deps.autorun =>
         box = Boxes.findOne({_id: @data._id})
         node.type = box.type
-        for input in box.inputs
-          if input.param
-            node[input.param].value = input.value
+        syncInputs node, box
       nodes[@data._id] = node
     else
       console.error "Not implemented: #{@data.name}"
         
+syncInputs = (node, box) ->
+  for input in box.inputs
+    if input.param
+      node[input.param].linearRampToValueAtTime input.value, audioContext.currentTime + 0.05
+
+
 Template.connection.created = ->
   connect @data
 
 connect = (conn) ->
-  if not nodes[conn.outputBoxId] or not nodes[conn.inputBoxId]
+  if not conn.connected
     Meteor.setTimeout((-> connect conn), 100)
   else
     try

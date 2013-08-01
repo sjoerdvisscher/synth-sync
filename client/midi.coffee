@@ -28,6 +28,9 @@
       when 0xB0
         handlers.oncontrolchange?(evt.data[1], evt.data[2])
 
+      when 0xE0
+        handlers.onpitchwheelchange?(((evt.data[1] & 0x7F) + 128 * (evt.data[2] & 0x7F)) / 0x2000 - 1)
+
 
 midiAccess = null
 
@@ -42,12 +45,22 @@ Meteor.startup ->
           id: port.id
           name: port.name
         @addMidiListener port.id, -1,
+          onnoteon: (note, velocity) ->
+            Boxes.find({name: "Oscillator", midiInput: port.id}).forEach (box) ->
+              Boxes.update {_id: box._id}, {$set: {"inputs.0.value": Math.round(4400 * Math.pow 2, (note - 0x39)/12) / 10}}
+          onpitchwheelchange: (change) -> 
+            Boxes.find({name: "Oscillator", midiInput: port.id}).forEach (box) ->
+              detune = box.inputs[1]
+              value = (change + 1) / 2 * (detune.max - detune.min) + detune.min
+              value = Math.round(value * 10) / 10
+              Boxes.update {_id: box._id}, {$set: {"inputs.1.value": value}}
           oncontrolchange: (control, value) ->
             if midiLearning and lastActiveRangeInput
               rangeInputs[control] = lastActiveRangeInput
             inp = rangeInputs[control]
             if inp
               inp.value = Math.round(1000*inp.min + (inp.max - inp.min) * value / 0.127) / 1000
+
     
       midiAccess.onconnect = (evt) ->
         console.log evt
@@ -75,17 +88,18 @@ Meteor.setInterval(
       props = {}
       props[inp.name] = inp.value
       Boxes.update {_id: inp._id}, {$set: props}
-  20
+  50
 )
 
 Template.box.events
 
-  "click input[type=range]": (evt) ->
+  "mousedown .range": (evt, template) ->
+    $tgt = $(evt.target)
     lastActiveRangeInput = 
-      _id: @_id
-      name: evt.target.name
-      min: evt.target.min
-      max: evt.target.max
+      _id: template.data._id
+      name: $tgt.data "param"
+      min: 1*$tgt.data "min"
+      max: 1*$tgt.data "max"
 
 Template.main.events
   

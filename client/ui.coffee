@@ -71,7 +71,7 @@ Template.box.events
   "click .close": ->
     Meteor.call "deleteBox", @_id
 
-  "mousedown :input, mousemove :input": (evt) ->
+  "mousedown :input": (evt) ->
     evt.stopImmediatePropagation()
     
   "mousedown": ->
@@ -81,9 +81,6 @@ Template.box.events
   "mousedown .range": (evt, template) ->
     param = $(evt.target).data "param"
     props = {}
-    props[param] = (@max - @min) * evt.offsetX / 140 + @min
-    props[param] = Math.round(props[param] * 100) / 100
-    Boxes.update {_id: template.data._id}, {$set: props}
     dragInfo.moveHandler = (dx, dy) =>
       props[param] += (@max - @min) * dx / 140
       props[param] = Math.round(props[param] * 100) / 100
@@ -92,6 +89,8 @@ Template.box.events
       if props[param] < @min
         props[param] = @min
       Boxes.update {_id: template.data._id}, {$set: props}
+    props[param] = @min
+    dragInfo.moveHandler(evt.offsetX, 0)
     dragInfo.startX = evt.pageX
     dragInfo.startY = evt.pageY
     evt.stopImmediatePropagation()
@@ -126,7 +125,7 @@ Template.box.events
       connected = false
     dragInfo.upHandler = ->
       if connected
-        Connections.update {_id: connId}, {$unset: {x: 0, y: 0}}
+        Connections.update {_id: connId}, {$unset: {x: 0, y: 0}, $set: {connected: true}}
       else
         Meteor.call "deleteConn", connId
         
@@ -175,7 +174,7 @@ Template.connection.points = ->
 
 
 Template.connection.dragging = ->
-  if @x then "dragging" else ""
+  if @connected then "" else "dragging"
   
 Template.connection.events
   "click": ->
