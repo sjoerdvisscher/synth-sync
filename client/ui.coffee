@@ -55,7 +55,12 @@ Template.box.midiDevices = ->
   return devices
 
 Template.box.rangeLeft = ->
-  return 140 * (@value - @min) / (@max - @min)
+  left = 140 * (@value - @min) / (@max - @min)
+  if left < 0
+    left = 0
+  if left > 139
+    left = 139
+  left
   
 Template.box.rendered = ->
   @findAll("select").map (sel) =>
@@ -76,8 +81,9 @@ Template.box.events
   "mousedown .range": (evt, template) ->
     param = $(evt.target).data "param"
     props = {}
-    props[param] = @value
-    console.log evt
+    props[param] = (@max - @min) * evt.offsetX / 140 + @min
+    props[param] = Math.round(props[param] * 100) / 100
+    Boxes.update {_id: template.data._id}, {$set: props}
     dragInfo.moveHandler = (dx, dy) =>
       props[param] += (@max - @min) * dx / 140
       props[param] = Math.round(props[param] * 100) / 100
