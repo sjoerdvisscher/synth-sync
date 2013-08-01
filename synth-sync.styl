@@ -29,6 +29,7 @@ svg
   
   .close
     margin-right: 0.5em
+  
   .port
     cursor: default
     height: 30px
@@ -51,9 +52,21 @@ svg
     &::before
       float: right
       margin-left: 10px
-  input[type=range], select
+  
+  select
     width: 100%
-  .min-input, .max-input
+  div.range
+    height: 12px
+    margin: 2px 0px
+    background: rgba(0,0,0,.2)
+    &::before
+      content: ""
+      display: block
+      height: 12px
+      border-left: 2px solid rgba(0,0,0,.5)
+      
+      
+  .min-input, .max-input, .value-output
     font-size: 0.8em
     line-height: 0.8em
     padding: 0
@@ -61,12 +74,20 @@ svg
     width: 3em
     text-align: right
   .min-input
-    float: left
+    position: absolute
+    left: 15px
   .max-input
-    float: right
+    position: absolute
+    right: 15px
   .value-output
+    display: block
+    padding: 0
+    width: 100%
+    border: none
+    background: transparent
     text-align: center
-    font-size: 0.8em
+    
+  
     
 .login-link-text
   text-decoration: none !important

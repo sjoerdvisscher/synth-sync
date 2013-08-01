@@ -52,10 +52,10 @@
       <div class="port input {{#if param}}param{{/if}}" data-type="input">
         {{name}}
         {{#if param}}
-          <input type="range" name="inputs.{{index}}.value" min="{{min}}" max="{{max}}" step="0.01" value="{{value}}">
+          <div class="range" style="padding-left: {{rangeLeft}}px" data-param="inputs.{{index}}.value"></div>
           <input name="inputs.{{index}}.min" value="{{min}}" class="min-input">
           <input name="inputs.{{index}}.max" value="{{max}}" class="max-input">
-          <div class="value-output">{{value}}</div>
+          <input name="inputs.{{index}}.value" value="{{value}}" class="value-output">
         {{/if}}
       </div>
     {{/each}}

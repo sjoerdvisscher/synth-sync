@@ -54,6 +54,9 @@ Template.box.midiDevices = ->
     device.selected = if device.id is @midiInput then "selected" else ""
   return devices
 
+Template.box.rangeLeft = ->
+  return 140 * (@value - @min) / (@max - @min)
+  
 Template.box.rendered = ->
   @findAll("select").map (sel) =>
     sel.value = @data[sel.name]
@@ -63,13 +66,30 @@ Template.box.events
   "click .close": ->
     Meteor.call "deleteBox", @_id
 
-  "mousedown :input, mousemove :input, mouseup :input": (evt) ->
+  "mousedown :input, mousemove :input": (evt) ->
     evt.stopImmediatePropagation()
     
   "mousedown": ->
     dragInfo.moveHandler = (dx, dy) =>
       Boxes.update {_id: @_id}, {$inc: {x: dx, y: dy}}
-      
+  
+  "mousedown .range": (evt, template) ->
+    param = $(evt.target).data "param"
+    props = {}
+    props[param] = @value
+    console.log evt
+    dragInfo.moveHandler = (dx, dy) =>
+      props[param] += (@max - @min) * dx / 140
+      props[param] = Math.round(props[param] * 100) / 100
+      if props[param] > @max
+        props[param] = @max
+      if props[param] < @min
+        props[param] = @min
+      Boxes.update {_id: template.data._id}, {$set: props}
+    dragInfo.startX = evt.pageX
+    dragInfo.startY = evt.pageY
+    evt.stopImmediatePropagation()
+
   "mousedown .port": (evt, template) ->
     from = $(evt.target).data "type"
     to = if from is "input" then "output" else "input"
