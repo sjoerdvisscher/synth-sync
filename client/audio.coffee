@@ -1,5 +1,18 @@
 audioContext = new webkitAudioContext()
 
+irHallBuffer = null
+
+$ ->
+  irHallRequest = new XMLHttpRequest
+  irHallRequest.open "GET", "sounds/irHall.ogg", true
+  irHallRequest.responseType = "arraybuffer"
+  irHallRequest.onload = ->
+    audioContext.decodeAudioData irHallRequest.response, (buffer) ->
+      irHallBuffer = buffer
+      Boxes.find({name: "Convolver"}).forEach (box) -> 
+        nodes[box._id]?.buffer = irHallBuffer
+  irHallRequest.send()
+  
 nodes = {}
 
 Template.box.created = ->
@@ -42,6 +55,10 @@ Template.box.created = ->
         box = Boxes.findOne({_id: @data._id})
         node.type = box.type
         syncInputs node, box
+      nodes[@data._id] = node
+    when "Convolver"
+      node = audioContext.createConvolver()
+      node.buffer = irHallBuffer
       nodes[@data._id] = node
     else
       console.error "Not implemented: #{@data.name}"

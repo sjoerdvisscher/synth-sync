@@ -43,3 +43,8 @@ Meteor.startup ->
     ]
     outputs: [{ name: "Audio Out" }]
     type: 0
+    
+  Components.insert
+    name: "Convolver"
+    inputs: [{ name: "Audio In" }]
+    outputs: [{ name: "Audio Out" }]
