@@ -83,7 +83,6 @@ Template.box.events
     props = {}
     dragInfo.moveHandler = (dx, dy) =>
       props[param] += (@max - @min) * dx / 140
-      props[param] = Math.round(props[param] * 100) / 100
       if props[param] > @max
         props[param] = @max
       if props[param] < @min
@@ -182,3 +181,12 @@ Template.connection.events
 
 getIndexByName = (list, name) ->
   _.find _.range(list.length), (i) => list[i].name is name
+  
+precision = (num, dec) ->
+  return 0 if num is 0 
+  size = Math.floor(Math.log(Math.abs(num)) / Math.LN10)
+  f = Math.pow(10, dec - size - 1)
+  Math.round(num * f) / f
+
+Handlebars.registerHelper "precision", (num) ->
+  precision num, 3

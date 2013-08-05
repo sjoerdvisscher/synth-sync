@@ -26,7 +26,7 @@ Meteor.startup ->
   Components.insert
     name: "Oscillator"
     inputs: [
-      { name: "Frequency", param: "frequency", min: 0, max: 20000, value: 440 },
+      { name: "Frequency", param: "frequency", min: 0, max: 2000, value: 440 },
       { name: "Detune", param: "detune", min: -1200, max: 1200, value: 0 }
     ]
     outputs: [{ name: "Audio Out" }]
@@ -36,7 +36,7 @@ Meteor.startup ->
     name: "Biquad Filter"
     inputs: [
       { name: "Audio In" },
-      { name: "Frequency", param: "frequency", min: 0, max: 20000, value: 350 },
+      { name: "Frequency", param: "frequency", min: 0, max: 2000, value: 350 },
       { name: "Detune", param: "detune", min: -1200, max: 1200, value: 0 },
       { name: "Q", param: "Q", min: 0, max: 1000, value: 1 },
       { name: "Gain", param: "gain", min: -40, max: 40, value: 0 }

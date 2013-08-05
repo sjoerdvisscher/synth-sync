@@ -46,26 +46,26 @@ Meteor.startup ->
           id: port.id
           name: port.name
         
-        @addMidiListener port.id, -1,
-          
-          onnoteon: (note, velocity) ->
-            freq = Math.round(4400 * Math.pow(2, (note - 69)/12)) / 10
-            Boxes.find({name: "Oscillator", midiInput: port.id}).forEach (box) ->
-              Boxes.update {_id: box._id}, {$set: {"inputs.0.value": freq }}
-          
-          onpitchwheelchange: (change) -> 
-            Boxes.find({name: "Oscillator", midiInput: port.id}).forEach (box) ->
-              detune = box.inputs[1]
-              value = (change + 1) / 2 * (detune.max - detune.min) + detune.min
-              value = Math.round(value * 10) / 10
-              Boxes.update {_id: box._id}, {$set: {"inputs.1.value": value}}
-          
-          oncontrolchange: (control, value) ->
-            if midiLearning and lastActiveRangeInput
-              rangeInputs[control] = lastActiveRangeInput
-            inp = rangeInputs[control]
-            if inp
-              inp.value = Math.round(1000*inp.min + (inp.max - inp.min) * value / 0.127) / 1000
+        do (port) -> 
+          @addMidiListener port.id, -1,
+            
+            onnoteon: (note, velocity) ->
+              freq = 440 * Math.pow(2, (note - 69) / 12)
+              Boxes.find({name: "Oscillator", midiInput: port.id}).forEach (box) ->
+                Boxes.update {_id: box._id}, {$set: {"inputs.0.value": freq }}
+            
+            onpitchwheelchange: (change) -> 
+              Boxes.find({name: "Oscillator", midiInput: port.id}).forEach (box) ->
+                detune = box.inputs[1]
+                value = (change + 1) / 2 * (detune.max - detune.min) + detune.min
+                Boxes.update {_id: box._id}, {$set: {"inputs.1.value": value}}
+            
+            oncontrolchange: (control, value) ->
+              if midiLearning and lastActiveRangeInput
+                rangeInputs[control] = lastActiveRangeInput
+              inp = rangeInputs[control]
+              if inp
+                inp.value = inp.min + (inp.max - inp.min) * value / 127
 
     
       midiAccess.onconnect = (evt) ->
