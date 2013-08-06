@@ -101,7 +101,10 @@ Template.box.events
       x: evt.pageX
       y: evt.pageY
     conn[from + "BoxId"] = template.data._id
-    conn[from + "Index"] = getIndexByName template.data[from + "s"], @name
+    ports = template.data[from + "s"]
+    index = getIndexByName ports, @name
+    conn[from + "Index"] = index
+    conn[from + "Param"] = ports[index].param
     connId = Connections.insert conn
     connected = false
     dragInfo.dropType = to
@@ -120,6 +123,7 @@ Template.box.events
       props = {}
       props[to + "BoxId"] = null
       props[to + "Index"] = null
+      props[to + "Param"] = null
       Connections.update {_id: connId}, {$unset: props}
       connected = false
     dragInfo.upHandler = ->

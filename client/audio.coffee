@@ -45,7 +45,7 @@ Template.box.created = ->
       node = audioContext.createOscillator()
       Deps.autorun =>
         box = Boxes.findOne({_id: @data._id})
-        node.type = box.type
+        node.type = box?.type
         syncInputs node, box
       node.start(audioContext.currentTime)
       nodes[@data._id] = node
@@ -53,7 +53,7 @@ Template.box.created = ->
       node = audioContext.createBiquadFilter()
       Deps.autorun =>
         box = Boxes.findOne({_id: @data._id})
-        node.type = box.type
+        node.type = box?.type
         syncInputs node, box
       nodes[@data._id] = node
     when "Convolver"
@@ -64,6 +64,7 @@ Template.box.created = ->
       console.error "Not implemented: #{@data.name}"
         
 syncInputs = (node, box) ->
+  return if not box
   for input in box.inputs
     if input.param
       node[input.param].linearRampToValueAtTime input.value, audioContext.currentTime + 0.05
@@ -74,7 +75,8 @@ Template.connection.created = ->
 
 connect = (conn) ->
   if not conn.connected
-    Meteor.setTimeout((-> connect conn), 100)
+    if not conn.destroyed
+      Meteor.setTimeout((-> connect conn), 100)
   else
     try
       console.log("creating: #{conn.outputBoxId} (#{conn.outputIndex}) -> " +
@@ -88,6 +90,7 @@ connect = (conn) ->
       Meteor.call "deleteConn", conn._id
 
 Template.connection.destroyed = ->
+  @data.destroyed = true
   nodes[@data.outputBoxId]?.disconnect()
   Connections.find({ outputBoxId: @data.outputBoxId }).forEach connect
     
