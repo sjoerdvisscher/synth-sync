@@ -21,7 +21,7 @@ dragInfo =
 Template.main.events
 
   "click [data-role=add-component]": ->
-    box = _.extend(_.omit(this, "_id"), { x: 100, y: 100 })
+    box = _.extend(_.omit(this, "_id"), { x: 100, y: 100, synthId: Session.get "synthId" })
     _.each box.inputs, (input, index) -> input.index = index
     Boxes.insert box
         
@@ -100,6 +100,7 @@ Template.box.events
     conn =
       x: evt.pageX
       y: evt.pageY
+      synthId: Session.get "synthId"
     conn[from + "BoxId"] = template.data._id
     ports = template.data[from + "s"]
     index = getIndexByName ports, @name
@@ -187,7 +188,7 @@ getIndexByName = (list, name) ->
   _.find _.range(list.length), (i) => list[i].name is name
   
 precision = (num, dec) ->
-  return 0 if num is 0 
+  return 0 if num is 0
   size = Math.floor(Math.log(Math.abs(num)) / Math.LN10)
   f = Math.pow(10, dec - size - 1)
   Math.round(num * f) / f

@@ -1,7 +1,7 @@
-Meteor.publish "boxes", ->
-  Boxes.find {}
-Meteor.publish "connections", ->
-  Connections.find {}
+Meteor.publish "synth", (synthId) ->
+  [ Boxes.find({ synthId: synthId })
+  , Connections.find({ synthId: synthId })
+  ]
 Meteor.publish "components", ->
   Components.find {}
   
