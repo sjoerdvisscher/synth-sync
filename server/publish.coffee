@@ -4,7 +4,10 @@ Meteor.publish "synth", (synthId) ->
   ]
 Meteor.publish "components", ->
   Components.find {}
-  
+
+Meteor.publish "synths", ->
+  Synths.find {}
+    
 Meteor.startup ->
 
   Boxes.allow

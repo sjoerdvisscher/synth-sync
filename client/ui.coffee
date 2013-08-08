@@ -1,3 +1,7 @@
+Template.main.home = ->
+  not Session.get "synthId"
+Template.main.synths = ->
+  Synths.find()
 Template.main.boxes = ->
   Boxes.find()
 Template.main.connections = ->

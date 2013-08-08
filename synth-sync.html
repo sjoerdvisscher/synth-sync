@@ -7,6 +7,16 @@
 </body>
 
 <template name="main">
+  {{#if home}}
+  <div class="container">
+    <h1>Synth Sync</h1>
+    <p>These are the active synths:</p>
+    <ul>
+      {{#each synths}}
+        <li><a href="/{{.}}">{{.}}</a></li>
+      {{/each}}
+    </ul>
+  {{else}}
   <div class="navbar navbar-static-top">
     <div class="navbar-inner">
       <div class="container">
@@ -42,6 +52,7 @@
       {{>connection}}
     {{/each}}
   </div>
+  {{/if}}
 </template>
 
 <template name="box">
