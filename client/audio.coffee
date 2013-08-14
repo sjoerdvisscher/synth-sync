@@ -74,7 +74,7 @@ Template.connection.created = ->
   connect @data
 
 connect = (conn) ->
-  if not conn.connected
+  if not conn.connected or not nodes[conn.inputBoxId] or not nodes[conn.outputBoxId]
     if not conn.destroyed
       Meteor.setTimeout((-> connect conn), 100)
   else
