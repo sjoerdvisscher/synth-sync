@@ -31,8 +31,7 @@ Template.main.events
   "click [data-role=rename-synth]": ->
     name = $("#synth-name").val()
     Meteor.call "renameSynth", Session.get("synthId"), name, () ->
-      Session.set "synthId", name
-      history.replaceState {}, name, name
+      showSynth name
   
   "click [data-role=clone-synth]": ->
     name = (new Date() - new Date(2013,7,22)).toString(36)
@@ -66,6 +65,10 @@ Template.main.events
   "click a[href='#']": (evt) ->
     evt.preventDefault()
 
+  "click a[href^='/']": (evt) ->
+    href = evt.target.getAttribute("href")
+    showSynth href.substr(1)
+    evt.preventDefault()
 
 
 Template.box.nameIs = (name) ->
@@ -207,6 +210,10 @@ Template.connection.events
   "click": ->
     Meteor.call "deleteConn", @_id
 
+showSynth = (synthId) ->
+  Session.set "synthId", synthId
+  history.replaceState {}, synthId, "/" + synthId
+  
 getIndexByName = (list, name) ->
   _.find _.range(list.length), (i) => list[i].name is name
   

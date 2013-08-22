@@ -9,14 +9,13 @@ $ ->
   irHallRequest.onload = ->
     audioContext.decodeAudioData irHallRequest.response, (buffer) ->
       irHallBuffer = buffer
-      Boxes.find({name: "Convolver"}).forEach (box) -> 
+      Boxes.find({name: "Convolver"}).forEach (box) ->
         nodes[box._id]?.buffer = irHallBuffer
   irHallRequest.send()
   
 nodes = {}
 
 Template.box.created = ->
-  console.log "creating: #{@data.name} (#{@data._id})"
   switch @data.name
     when "Microphone"
       navigator.webkitGetUserMedia(
@@ -62,13 +61,20 @@ Template.box.created = ->
       nodes[@data._id] = node
     else
       console.error "Not implemented: #{@data.name}"
-        
+
 syncInputs = (node, box) ->
   return if not box
   for input in box.inputs
     if input.param
       node[input.param].linearRampToValueAtTime input.value, audioContext.currentTime + 0.05
 
+Template.box.destroyed = ->
+  try
+    nodes[@data._id]?.disconnect()
+  catch e
+    console.log e
+  delete nodes[@data._id]
+  
 
 Template.connection.created = ->
   connect @data
