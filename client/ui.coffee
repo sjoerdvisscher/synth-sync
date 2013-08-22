@@ -1,7 +1,7 @@
-Template.main.home = ->
-  not Session.get "synthId"
+Template.main.synthId = ->
+  Session.get "synthId"
 Template.main.synths = ->
-  Synths.find()
+  Synths.find {}, { sort: { lastChange: -1 } }
 Template.main.boxes = ->
   Boxes.find()
 Template.main.connections = ->
@@ -10,7 +10,8 @@ Template.main.components = ->
   Components.find()
 Template.main.midiDevices = ->
   MIDIDevices.find()
-
+Template.main.datediff = ->
+  moment.duration(moment(Session.get("date")).diff(this.lastChange)).humanize()
 
 dragInfo =
   startX: 0
@@ -24,10 +25,25 @@ dragInfo =
 
 Template.main.events
 
+  "click [data-role=add-synth]": ->
+    location.href = "/" + (new Date() - new Date(2013,7,22)).toString(36)
+    
+  "click [data-role=rename-synth]": ->
+    name = $("#synth-name").val()
+    Meteor.call "renameSynth", Session.get("synthId"), name, () ->
+      Session.set "synthId", name
+      history.replaceState {}, name, name
+  
+  "click [data-role=clone-synth]": ->
+    name = (new Date() - new Date(2013,7,22)).toString(36)
+    Meteor.call "cloneSynth", Session.get("synthId"), name, () ->
+      Session.set "synthId", name
+      history.replaceState {}, name, name
+            
   "click [data-role=add-component]": ->
     box = _.extend(_.omit(this, "_id"), { x: 100, y: 100, synthId: Session.get "synthId" })
     _.each box.inputs, (input, index) -> input.index = index
-    Boxes.insert box
+    Meteor.call "insertBox", box
         
   "mousedown": (evt) ->
     dragInfo.startX = evt.pageX
@@ -46,6 +62,9 @@ Template.main.events
     dragInfo.enterHandler = null
     dragInfo.leaveHandler = null
     dragInfo.upHandler = null
+    
+  "click a[href='#']": (evt) ->
+    evt.preventDefault()
 
 
 
@@ -110,32 +129,32 @@ Template.box.events
     index = getIndexByName ports, @name
     conn[from + "Index"] = index
     conn[from + "Param"] = ports[index].param
-    connId = Connections.insert conn
-    connected = false
-    dragInfo.dropType = to
-    dragInfo.moveHandler = (dx, dy) =>
-      Connections.update {_id: connId}, {$inc: {x: dx, y: dy}}
-    dragInfo.enterHandler = (boxId, name) ->
-      props = {}
-      props[to + "BoxId"] = boxId
-      ports = (Boxes.findOne {_id: boxId})[to + "s"]
-      index = getIndexByName ports, name
-      props[to + "Index"] = index
-      props[to + "Param"] = ports[index].param
-      Connections.update {_id: connId}, {$set: props}
-      connected = true
-    dragInfo.leaveHandler = ->
-      props = {}
-      props[to + "BoxId"] = null
-      props[to + "Index"] = null
-      props[to + "Param"] = null
-      Connections.update {_id: connId}, {$unset: props}
+    connId = Meteor.call "insertConn", conn, (err, connId) ->
       connected = false
-    dragInfo.upHandler = ->
-      if connected
-        Connections.update {_id: connId}, {$unset: {x: 0, y: 0}, $set: {connected: true}}
-      else
-        Meteor.call "deleteConn", connId
+      dragInfo.dropType = to
+      dragInfo.moveHandler = (dx, dy) =>
+        Connections.update {_id: connId}, {$inc: {x: dx, y: dy}}
+      dragInfo.enterHandler = (boxId, name) ->
+        props = {}
+        props[to + "BoxId"] = boxId
+        ports = (Boxes.findOne {_id: boxId})[to + "s"]
+        index = getIndexByName ports, name
+        props[to + "Index"] = index
+        props[to + "Param"] = ports[index].param
+        Connections.update {_id: connId}, {$set: props}
+        connected = true
+      dragInfo.leaveHandler = ->
+        props = {}
+        props[to + "BoxId"] = null
+        props[to + "Index"] = null
+        props[to + "Param"] = null
+        Connections.update {_id: connId}, {$unset: props}
+        connected = false
+      dragInfo.upHandler = ->
+        if connected
+          Connections.update {_id: connId}, {$unset: {x: 0, y: 0}, $set: {connected: true}}
+        else
+          Meteor.call "deleteConn", connId
         
   "mouseenter .port": (evt, template) ->
     if dragInfo.enterHandler and $(evt.target).data("type") is dragInfo.dropType

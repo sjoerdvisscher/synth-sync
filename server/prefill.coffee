@@ -1,6 +1,7 @@
 Meteor.startup ->
   # Boxes.remove {}
   # Connections.remove {}
+  # Synths.remove {}
   Components.remove {}
   
   Components.insert
